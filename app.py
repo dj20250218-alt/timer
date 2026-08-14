@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 
 # -----------------------------------------------------------------------------
@@ -84,7 +82,7 @@ st.markdown("""
 
 
 # -----------------------------------------------------------------------------
-# 2. 레시피 데이터베이스 (타이머 시간 제거됨)
+# 2. 레시피 데이터베이스 (한식, 양식, 중식, 일식)
 # -----------------------------------------------------------------------------
 RECIPE_DB = {
     "한식": {
@@ -101,6 +99,11 @@ RECIPE_DB = {
         "초보": {"name": "계란볶음밥", "recipe": "1. 팬에 기름을 둘러 대파를 볶아 파기름을 만듭니다.\n2. 계란을 깨넣고 부드럽게 스크램블을 만듭니다.\n3. 밥을 넣고 강불에 날려가며 볶다가 굴소스로 간을 맞춥니다."},
         "중수": {"name": "마파두부", "recipe": "1. 팬에 다진 돼지고기와 두반장을 함께 볶습니다.\n2. 물과 깍둑썰기한 두부를 넣고 끓여줍니다.\n3. 전분물을 조금씩 넣어가며 농도를 맞추고 화조유를 살짝 뿌립니다."},
         "고수": {"name": "동파육", "recipe": "1. 통삼겹살을 삶은 후 겉면을 바삭하게 구워냅니다.\n2. 간장, 팔각, 굴소스 등을 넣은 양념물에 고기를 넣습니다.\n3. 약불에서 2시간 이상 양념이 쏙 베어들 때까지 부드럽게 조립니다."}
+    },
+    "일식": {
+        "초보": {"name": "치킨마요 덮밥", "recipe": "1. 남은 치킨이나 치킨너겟을 바삭하게 데운 뒤 잘라줍니다.\n2. 달걀을 풀어 부드러운 스크램블 에그를 만듭니다.\n3. 따뜻한 밥 위에 스크램블, 치킨, 간장 양념(간장+설탕+맛술)을 올립니다.\n4. 마요네즈와 김가루를 솔솔 뿌려 완성합니다."},
+        "중수": {"name": "규동 (소고기덮밥)", "recipe": "1. 냄비에 물, 간장, 쯔유, 맛술, 설탕을 넣고 얇게 썬 양파를 끓입니다.\n2. 양파가 투명해지면 얇은 불고기용 소고기를 넣고 익힙니다.\n3. 밥 위에 국물과 함께 소고기, 양파를 듬뿍 올립니다.\n4. 계란 노른자나 초생강을 올리면 더욱 완성도가 높아집니다."},
+        "고수": {"name": "돈코츠 라멘", "recipe": "1. 돼지 사골과 잡뼈를 우려내어 진한 육수를 준비합니다.\n2. 차슈(삼겹살)를 간장 양념에 장시간 졸여 부드럽게 만듭니다.\n3. 면을 살짝 삶아 그릇에 담고, 진한 육수와 간장 타레(소스)를 섞어 붓습니다.\n4. 차슈, 아지타마고(반숙란), 대파, 숙주를 고명으로 올립니다."}
     }
 }
 
@@ -108,6 +111,7 @@ RECIPE_DB = {
 POPULAR_DISHES = [
     ("🔥 인기: 김치볶음밥 (한식/초보)", "한식", "초보"),
     ("🔥 인기: 알리오 올리오 (양식/초보)", "양식", "초보"),
+    ("🔥 인기: 치킨마요 덮밥 (일식/초보)", "일식", "초보"),
     ("🔥 인기: 마파두부 (중식/중수)", "중식", "중수")
 ]
 
@@ -139,11 +143,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# [Step 1] 요리 종류 선택
+# [Step 1] 요리 종류 선택 (4개 열로 구성)
 if st.session_state.category is None:
     st.subheader("1. 어떤 종류의 요리를 원하시나요?")
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         if st.button("🍚 한식"):
             st.session_state.category = "한식"
@@ -155,6 +159,10 @@ if st.session_state.category is None:
     with col3:
         if st.button("🥢 중식"):
             st.session_state.category = "중식"
+            st.rerun()
+    with col4:
+        if st.button("🍣 일식"):
+            st.session_state.category = "일식"
             st.rerun()
             
     st.markdown("---")
@@ -188,14 +196,13 @@ elif st.session_state.level is None:
         reset_all()
         st.rerun()
 
-# [Step 3] 레시피 출력 (타이머 기능 제거)
+# [Step 3] 레시피 출력
 else:
     current_recipe = RECIPE_DB[st.session_state.category][st.session_state.level]
     
     st.success(f"**선택한 메뉴:** [{st.session_state.category}] **{current_recipe['name']}** ({st.session_state.level} 단계)")
     
     st.subheader("📖 맞춤 레시피")
-    # 레시피 내용을 줄바꿈 처리하여 보여줌
     formatted_recipe = current_recipe['recipe'].replace("\n", "<br>")
     st.markdown(f"<div class='recipe-box'>{formatted_recipe}</div>", unsafe_allow_html=True)
 
@@ -204,3 +211,4 @@ else:
     if st.button("🏠 처음으로 돌아가기"):
         reset_all()
         st.rerun()
+
